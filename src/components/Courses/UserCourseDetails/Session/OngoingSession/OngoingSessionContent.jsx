@@ -50,12 +50,12 @@ const OngoingSessionContent = () => {
           </div>
         </div>
         <div className="flex gap-3 items-center">
-          <div className="bg-gray-100 p-2 text-lg rounded-lg">
+          {/* <div className="bg-gray-100 p-2 text-lg rounded-lg">
             <BsFillChatSquareTextFill />
-          </div>
-          <div className="bg-gray-100 p-2 text-lg rounded-lg">
+          </div> */}
+          {/* <div className="bg-gray-100 p-2 text-lg rounded-lg">
             <IoCall />
-          </div>
+          </div> */}
         </div>
       </div>
       <p>

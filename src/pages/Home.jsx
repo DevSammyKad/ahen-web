@@ -45,7 +45,7 @@ const Home = () => {
     }
   };
 
-  // console.log('Upcoming Session:', upcomingSession);
+  console.log('Upcoming Session:', upcomingSession);
 
   useEffect(() => {
     fetchUpcomingSession();
