@@ -5,10 +5,12 @@ import Attached_two from '../Images/Attached-two.svg';
 import LearningLicense from './LearningLicense';
 import DrivingLicenseSection from './DrivingLicenseSection';
 import toast, { Toaster } from 'react-hot-toast';
+import LearningLicenseTracker from './LearningLicenseTracker';
+import DrivingLicenseTracker from './DrivingLicenseTracker';
 
 function LicenseProgress() {
   const [learningData, setLearningData] = useState(null);
-  const [drivingData, setDrivingData] = useState(null);
+  const [drivingData, setDrivingData] = useState({});
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('user_id');
@@ -26,7 +28,7 @@ function LicenseProgress() {
           `https://driving.shellcode.cloud/api/progress/learning/${storedUserId}`
         );
         const data = await response.json();
-        setLearningData(data.data);
+        setLearningData(data.data || {});
       } catch (error) {
         console.error('Error fetching learning data:', error);
       }
@@ -89,9 +91,36 @@ function LicenseProgress() {
         <div className="text-2xl font-semibold text-gray-800 mb-6">
           <h2>License Progress</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-3">
-          {learningData && <LearningLicense data={learningData} />}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-3 max-w-7xl ">
+          {/* {learningData && <LearningLicense data={learningData} />}
           {drivingData && <DrivingLicenseSection data={drivingData} />}
+           */}
+
+          {!learningData ? (
+            <a
+              href="/learning-license"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xl text-blue-500 hover:underline mt-1 inline-block"
+            >
+              Apply for Learning License
+            </a>
+          ) : (
+            <LearningLicenseTracker data={learningData} />
+          )}
+
+          {!drivingData ? (
+            <a
+              href="/driving-license"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xl text-blue-500 hover:underline mt-1 inline-block cursor-pointer"
+            >
+              Apply for Driving License
+            </a>
+          ) : (
+            <DrivingLicenseTracker data={drivingData} />
+          )}
         </div>
       </div>
     </>

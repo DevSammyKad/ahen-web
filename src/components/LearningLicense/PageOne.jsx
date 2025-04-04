@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom"; // Added for navigation
-import Navbar from "../Navbar";
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom'; // Added for navigation
+import Navbar from '../Navbar';
 
 const PageOne = () => {
   const [step, setStep] = useState(1);
-  const [vehicleType, setVehicleType] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [qualification, setQualification] = useState("");
+  const [vehicleType, setVehicleType] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [qualification, setQualification] = useState('');
   const [uploads, setUploads] = useState({
     aadhaarFront: null,
     aadhaarBack: null,
@@ -20,7 +20,7 @@ const PageOne = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem("user_id");
+    const storedUserId = localStorage.getItem('user_id');
 
     if (storedUserId) {
       const fetchProfile = async () => {
@@ -33,8 +33,8 @@ const PageOne = () => {
             setUser(data.user);
           }
         } catch (error) {
-          console.error("Error fetching profile data:", error);
-          toast.error("Error fetching profile data.");
+          console.error('Error fetching profile data:', error);
+          toast.error('Error fetching profile data.');
         }
       };
 
@@ -46,23 +46,23 @@ const PageOne = () => {
     const fetchPrice = async () => {
       try {
         const response = await fetch(
-          "https://driving.shellcode.cloud/license/licenses/price"
+          'https://driving.shellcode.cloud/license/licenses/price'
         );
         const data = await response.json();
         if (response.ok && data?.data) {
           const learningPrice = data.data.find(
-            (item) => item.price_type === "learning_license_customer_price"
+            (item) => item.price_type === 'learning_license_customer_price'
           );
           if (learningPrice) {
             setPrice(parseFloat(learningPrice.price));
           } else {
-            toast.error("Price data not found.");
+            toast.error('Price data not found.');
           }
         } else {
-          toast.error("Failed to fetch price data.");
+          toast.error('Failed to fetch price data.');
         }
       } catch (error) {
-        toast.error("An error occurred while fetching price data.");
+        toast.error('An error occurred while fetching price data.');
       }
     };
 
@@ -78,9 +78,9 @@ const PageOne = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const storedUserId = localStorage.getItem("user_id");
+    const storedUserId = localStorage.getItem('user_id');
     if (!storedUserId) {
-      toast.error("User ID not found. Please log in again.");
+      toast.error('User ID not found. Please log in again.');
       return;
     }
 
@@ -92,41 +92,41 @@ const PageOne = () => {
       !uploads.signature
     ) {
       toast.error(
-        "Please fill in all required fields and upload necessary files."
+        'Please fill in all required fields and upload necessary files.'
       );
       return;
     }
 
     const formDataObj = new FormData();
-    formDataObj.append("license_type", "learning");
-    formDataObj.append("vehicle_type", vehicleType);
-    formDataObj.append("mobile_number", mobileNumber);
-    formDataObj.append("qualification", qualification || "");
-    formDataObj.append("vendor_id", "1");
-    
+    formDataObj.append('license_type', 'learning');
+    formDataObj.append('vehicle_type', vehicleType);
+    formDataObj.append('mobile_number', mobileNumber);
+    formDataObj.append('qualification', qualification || '');
+    formDataObj.append('vendor_id', '1');
+
     formDataObj.append(
-      "aadhar_front_photo",
+      'aadhar_front_photo',
       uploads.aadhaarFront,
       uploads.aadhaarFront.name
     );
     formDataObj.append(
-      "aadhar_back_photo",
+      'aadhar_back_photo',
       uploads.aadhaarBack,
       uploads.aadhaarBack.name
     );
     formDataObj.append(
-      "signature_photo",
+      'signature_photo',
       uploads.signature,
       uploads.signature.name
     );
-    formDataObj.append("payment_filed", price.toString());
-    formDataObj.append("user_id", storedUserId);
+    formDataObj.append('payment_filed', price.toString());
+    formDataObj.append('user_id', storedUserId);
 
     try {
       const response = await fetch(
-        "https://driving.shellcode.cloud/license/learning/create",
+        'https://driving.shellcode.cloud/license/learning/create',
         {
-          method: "POST",
+          method: 'POST',
           body: formDataObj,
         }
       );
@@ -134,57 +134,57 @@ const PageOne = () => {
       const responseData = await response.json();
       if (response.ok && responseData.success) {
         toast.success(responseData.message);
-        navigate("/"); // Navigate to home after success
+        navigate('/'); // Navigate to home after success
       } else {
         toast.error(
-          responseData.message || "Submission failed. Please try again."
+          responseData.message || 'Submission failed. Please try again.'
         );
       }
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
+      toast.error('An error occurred. Please try again.');
     }
   };
 
   const initializeRazorpay = async (amount, description) => {
     if (!user.phone_number) {
-      toast.error("Please update user profile");
+      toast.error('Please update user profile ');
       return;
     }
 
-    const tokenData = localStorage.getItem("token");
+    const tokenData = localStorage.getItem('token');
     const { value } = JSON.parse(tokenData);
     const response = await fetch(
-      "https://driving.shellcode.cloud/api/payments/create-order",
+      'https://driving.shellcode.cloud/api/payments/create-order',
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${value}`,
         },
         body: JSON.stringify({
           amount,
-          currency: "INR",
-          receipt: "receipt#1",
+          currency: 'INR',
+          receipt: 'receipt#1',
         }),
-        credentials: "include",
+        credentials: 'include',
       }
     );
 
     const data = await response.json();
     if (!data.success) {
-      toast.error("Failed to create order. Please try again.");
+      toast.error('Failed to create order. Please try again.');
       return;
     }
 
     const options = {
-      key: "rzp_test_3sEAtEoClhTs62",
+      key: 'rzp_test_3sEAtEoClhTs62',
       amount: data.order.amount,
-      currency: "INR",
-      name: "Ahen",
+      currency: 'INR',
+      name: 'Ahen',
       description,
       order_id: data.order.id,
       handler: async () => {
-        toast.success("Payment successful!");
+        toast.success('Payment successful!');
         setIsPayed(true); // Update the button after payment success
       },
       prefill: {
@@ -192,12 +192,12 @@ const PageOne = () => {
         email: user.email,
         contact: `+91${user?.phone_number}`,
       },
-      theme: { color: "#3399cc" },
+      theme: { color: '#3399cc' },
     };
 
     const razorpay = new window.Razorpay(options);
-    razorpay.on("payment.failed", () =>
-      toast.error("Payment failed. Please try again.")
+    razorpay.on('payment.failed', () =>
+      toast.error('Payment failed. Please try again.')
     );
     razorpay.open();
   };
@@ -208,7 +208,7 @@ const PageOne = () => {
       <div className="flex flex-col items-center justify-center h-screen p-4 bg-gray-100">
         {step === 1 && (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-2 md:justify-center">
-            {["2 Wheeler", "4 Wheeler", "T-Permit", "2 & 4 Wheeler"].map(
+            {['2 Wheeler', '4 Wheeler', 'T-Permit', '2 & 4 Wheeler'].map(
               (type) => (
                 <button
                   key={type}
@@ -216,7 +216,8 @@ const PageOne = () => {
                   onClick={() => {
                     setVehicleType(type);
                     setStep(2);
-                  }}>
+                  }}
+                >
                   {type}
                 </button>
               )
@@ -227,11 +228,13 @@ const PageOne = () => {
         {step === 2 && (
           <form
             className="w-full max-w-lg space-y-6 mt-8 p-6 bg-white rounded-lg shadow-lg"
-            onSubmit={handleSubmit}>
+            onSubmit={handleSubmit}
+          >
             <div>
               <label
                 htmlFor="mobile"
-                className="block mb-2 text-lg font-medium text-gray-700">
+                className="block mb-2 text-lg font-medium text-gray-700"
+              >
                 Mobile Number (Aadhaar linked)
                 <span className="text-red-500">*</span>
               </label>
@@ -249,16 +252,18 @@ const PageOne = () => {
             <div>
               <label
                 htmlFor="qualification"
-                className="block mb-2 text-lg font-medium text-gray-700">
+                className="block mb-2 text-lg font-medium text-gray-700"
+              >
                 Qualification
               </label>
               <select
                 id="qualification"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 value={qualification}
-                onChange={(e) => setQualification(e.target.value)}>
+                onChange={(e) => setQualification(e.target.value)}
+              >
                 <option value="">Select Qualification</option>
-                {["10th", "12th", "Graduate", "Post Graduate"].map((qual) => (
+                {['10th', '12th', 'Graduate', 'Post Graduate'].map((qual) => (
                   <option key={qual} value={qual}>
                     {qual}
                   </option>
@@ -267,12 +272,12 @@ const PageOne = () => {
             </div>
 
             <div>
-              {["aadhaarFront", "aadhaarBack", "signature"].map((key) => (
+              {['aadhaarFront', 'aadhaarBack', 'signature'].map((key) => (
                 <div key={key}>
                   <label className="block mb-2 text-lg font-medium text-gray-700">
                     {key
-                      .replace(/([A-Z])/g, " $1")
-                      .replace("aadhaar", "Aadhaar")}
+                      .replace(/([A-Z])/g, ' $1')
+                      .replace('aadhaar', 'Aadhaar')}
                     <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -294,14 +299,16 @@ const PageOne = () => {
             {isPayed ? (
               <button
                 onClick={handleSubmit}
-                className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
+                className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out"
+              >
                 Submit
               </button>
             ) : (
               <button
                 type="button"
                 className="w-full py-3 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
-                onClick={() => initializeRazorpay(price, "Learning License")}>
+                onClick={() => initializeRazorpay(price, 'Learning License')}
+              >
                 Proceed to Payment
               </button>
             )}

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { FaIdCard } from "react-icons/fa";
-import { toast } from "react-hot-toast";
-import Navbar from "./../Navbar";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { FaIdCard } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
+import Navbar from './../Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const PageOne = () => {
   const [step, setStep] = useState(1);
-  const [vehicleType, setVehicleType] = useState("");
+  const [vehicleType, setVehicleType] = useState('');
   const [uploads, setUploads] = useState({
     llPhoto: null,
   });
@@ -17,7 +17,7 @@ const PageOne = () => {
 
   // Fetch user profile on component load
   useEffect(() => {
-    const storedUserId = localStorage.getItem("user_id");
+    const storedUserId = localStorage.getItem('user_id');
 
     if (storedUserId) {
       const fetchProfile = async () => {
@@ -29,18 +29,18 @@ const PageOne = () => {
           if (data?.user) {
             setUser(data.user);
           } else {
-            toast.error("User data not found.");
+            toast.error('User data not found.');
           }
         } catch (error) {
-          console.error("Error fetching profile data:", error);
-          toast.error("Error fetching profile data.");
+          console.error('Error fetching profile data:', error);
+          toast.error('Error fetching profile data.');
         }
       };
 
       fetchProfile();
     } else {
-      toast.error("User not logged in.");
-      navigate("/login");
+      toast.error('User not logged in.');
+      navigate('/login');
     }
   }, [navigate]);
 
@@ -49,23 +49,23 @@ const PageOne = () => {
     const fetchPrice = async () => {
       try {
         const response = await fetch(
-          "https://driving.shellcode.cloud/license/licenses/price"
+          'https://driving.shellcode.cloud/license/licenses/price'
         );
         const data = await response.json();
         if (response.ok && data?.data) {
           const drivingPrice = data.data.find(
-            (item) => item.price_type === "driving_license_customer_price"
+            (item) => item.price_type === 'driving_license_customer_price'
           );
           if (drivingPrice) {
             setPrice(parseFloat(drivingPrice.price));
           } else {
-            toast.error("Price data not found.");
+            toast.error('Price data not found.');
           }
         } else {
-          toast.error("Failed to fetch price data.");
+          toast.error('Failed to fetch price data.');
         }
       } catch (error) {
-        toast.error("An error occurred while fetching price data.");
+        toast.error('An error occurred while fetching price data.');
       }
     };
 
@@ -83,33 +83,32 @@ const PageOne = () => {
 
     // Ensure user details are complete
     if (!user?.phone_number) {
-      toast.error("Please update your profile with a valid phone number.");
+      toast.error('Please update your profile with a valid phone number.');
       return;
     }
 
     if (!vehicleType || !uploads.llPhoto) {
       toast.error(
-        "Please select a vehicle type and upload the required Learning License photo."
+        'Please select a vehicle type and upload the required Learning License photo.'
       );
       return;
     }
 
-    const storedUserId = localStorage.getItem("user_id");
+    const storedUserId = localStorage.getItem('user_id');
 
     const formDataObj = new FormData();
-    formDataObj.append("license_type", "driving");
-    formDataObj.append("vehicle_type", vehicleType);
-    formDataObj.append("LL_photo", uploads.llPhoto); // Appending the file
-    formDataObj.append("payment_filed", price.toString());
-    formDataObj.append("user_id", storedUserId);
-    formDataObj.append("vendor_id", "1");
-
+    formDataObj.append('license_type', 'driving');
+    formDataObj.append('vehicle_type', vehicleType);
+    formDataObj.append('LL_photo', uploads.llPhoto); // Appending the file
+    formDataObj.append('payment_filed', price.toString());
+    formDataObj.append('user_id', storedUserId);
+    formDataObj.append('vendor_id', '1');
 
     try {
       const response = await fetch(
-        "https://driving.shellcode.cloud/license/driving/create",
+        'https://driving.shellcode.cloud/license/driving/create',
         {
-          method: "POST",
+          method: 'POST',
           body: formDataObj,
         }
       );
@@ -118,79 +117,84 @@ const PageOne = () => {
         const responseData = await response.json();
         console.log(responseData);
         if (responseData.success) {
-          toast.success("Data added successfully!");
-          navigate("/"); // Navigate to home after success
+          toast.success('Data added successfully!');
+          navigate('/'); // Navigate to home after success
         }
       } else {
-        toast.error("Submission failed. Please try again.");
+        toast.error('Submission failed. Please try again.');
       }
     } catch (error) {
-      console.error("Error during form submission:", error);
-      toast.error("An error occurred. Please try again.");
+      console.error('Error during form submission:', error);
+      toast.error('An error occurred. Please try again.');
     }
   };
 
   const initializeRazorpay = async (amount, description) => {
     try {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      if (!user.phone_number) {
+        toast.error('Please update user profile ');
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.async = true;
       document.body.appendChild(script);
 
       script.onload = async () => {
-        const tokenData = localStorage.getItem("token");
+        const tokenData = localStorage.getItem('token');
         const { value } = JSON.parse(tokenData);
         const response = await fetch(
-          "https://driving.shellcode.cloud/api/payments/create-order",
+          'https://driving.shellcode.cloud/api/payments/create-order',
           {
-            method: "POST",
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
               Authorization: `Bearer ${value}`,
             },
             body: JSON.stringify({
               amount,
-              currency: "INR",
-              receipt: "receipt#1",
+              currency: 'INR',
+              receipt: 'receipt#1',
             }),
-            credentials: "include",
+            credentials: 'include',
           }
         );
 
         const data = await response.json();
         if (!data.success) {
-          toast.error("Failed to create order. Please try again.");
+          toast.error('Failed to create order. Please try again.');
           return;
         }
 
         const options = {
-          key: "rzp_test_3sEAtEoClhTs62",
+          key: 'rzp_test_3sEAtEoClhTs62',
           amount: data.order.amount,
-          currency: "INR",
-          name: "Driving License",
+          currency: 'INR',
+          name: 'Driving License',
           description,
           order_id: data.order.id,
           prefill: {
-            name: user?.name || "",
-            email: user?.email || "",
+            name: user?.name || '',
+            email: user?.email || '',
             contact: `+91${user?.phone_number}`,
           },
           handler: async () => {
-            toast.success("Payment successful! 🎉");
+            toast.success('Payment successful! 🎉');
             setIsPayed(true);
           },
-          theme: { color: "#3399cc" },
+          theme: { color: '#3399cc' },
         };
 
         const razorpay = new window.Razorpay(options);
-        razorpay.on("payment.failed", () =>
-          toast.error("Payment failed. Please try again.")
+        razorpay.on('payment.failed', () =>
+          toast.error('Payment failed. Please try again.')
         );
         razorpay.open();
       };
     } catch (error) {
-      console.error("Error initializing Razorpay:", error);
-      toast.error("An unexpected error occurred. Please try again.");
+      console.error('Error initializing Razorpay:', error);
+      toast.error('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -200,7 +204,7 @@ const PageOne = () => {
       <div className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4">
         {step === 1 && (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-2 md:justify-center lg:grid-cols-2">
-            {["2 Wheeler", "4 Wheeler", "T-Permit", "2 & 4 Wheeler"].map(
+            {['2 Wheeler', '4 Wheeler', 'T-Permit', '2 & 4 Wheeler'].map(
               (type) => (
                 <button
                   key={type}
@@ -208,7 +212,8 @@ const PageOne = () => {
                   onClick={() => {
                     setVehicleType(type);
                     setStep(2);
-                  }}>
+                  }}
+                >
                   {type}
                 </button>
               )
@@ -219,20 +224,22 @@ const PageOne = () => {
         {step === 2 && (
           <form
             className="mt-8 w-full max-w-lg space-y-6 rounded-lg bg-white p-6 shadow-lg"
-            onSubmit={handleSubmit}>
+            onSubmit={handleSubmit}
+          >
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 <FaIdCard size={24} className="text-gray-500" />
                 <label
                   htmlFor="llPhoto"
-                  className="flex-1 text-lg text-gray-700">
+                  className="flex-1 text-lg text-gray-700"
+                >
                   Learning License Photo (LL)
                 </label>
                 <input
                   id="llPhoto"
                   type="file"
                   className="w-40 rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => handleFileUpload(e, "llPhoto")}
+                  onChange={(e) => handleFileUpload(e, 'llPhoto')}
                   accept=".jpg,.png,.pdf"
                   required
                 />
@@ -248,14 +255,16 @@ const PageOne = () => {
             {isPayed ? (
               <button
                 onClick={handleSubmit}
-                className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out">
+                className="w-full py-3 text-white bg-green-500 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out"
+              >
                 Submit
               </button>
             ) : (
               <button
                 type="button"
                 className="w-full py-3 text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
-                onClick={() => initializeRazorpay(price, "Learning License")}>
+                onClick={() => initializeRazorpay(price, 'Learning License')}
+              >
                 Proceed to Payment
               </button>
             )}
