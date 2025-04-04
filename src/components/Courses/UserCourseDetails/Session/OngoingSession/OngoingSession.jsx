@@ -49,7 +49,7 @@ const Map = ({ isBlurred }) => {
       )}
       
       <LoadScript 
-        googleMapsApiKey="AIzaSyAWe4LFxfgpy5MwsqGk4lAijUWE0L3iN0Y"
+        googleMapsApiKey=""
         onLoad={() => setIsLoaded(true)}
         onError={() => console.log("Error loading Google Maps")}
       >
