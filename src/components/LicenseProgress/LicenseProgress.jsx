@@ -6,6 +6,7 @@ import Attached_two from '../Images/Attached-two.svg';
 import toast from 'react-hot-toast';
 import LearningLicenseTracker from './LearningLicenseTracker';
 import DrivingLicenseTracker from './DrivingLicenseTracker';
+import DrivingLicenseTrackerFinal from './DrivingLicenseTrackerfinal';
 
 function LicenseProgress() {
   const [learningData, setLearningData] = useState(null);
@@ -13,6 +14,8 @@ function LicenseProgress() {
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('user_id');
+
+    // const storedUserId = 152;
 
     if (!storedUserId) {
       toast.error('User ID not found. Please log in again.');
@@ -118,7 +121,8 @@ function LicenseProgress() {
               Apply for Driving License
             </a>
           ) : (
-            <DrivingLicenseTracker data={drivingData} />
+            <DrivingLicenseTrackerFinal data={drivingData} />
+            // <DrivingLicenseTracker data={drivingData} />
           )}
         </div>
       </div>

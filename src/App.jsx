@@ -36,10 +36,13 @@ const Session = lazy(() =>
 );
 const Login = lazy(() => import("./Auth/Login"));
 import Loading from "./components/Loading";
+import StartSession from "./components/Courses/UserCourseDetails/Session/StartSession";
+import RateInstructor from "./components/RateInstructor";
 
 const App = () => {
   const isWishlistOpen = useSelector((state) => state.wishlist.isWishlistOpen);
   const isUserLoginOpen = useSelector((state) => state.user.isUserLoginOpen);
+  const isStartSessionOpen = useSelector((state) => state.session.isStartSessionOpen);
 
   return (
     <div
@@ -61,11 +64,29 @@ const App = () => {
                 </ProtectedRoutes>
               }
             />
+            
             <Route
+              path="/session"
+              element={
+                <ProtectedRoutes>
+                  <OngoingSession />
+                </ProtectedRoutes>
+              }
+            />
+
+<Route
               path="/courses"
               element={
                 <ProtectedRoutes>
                   <Courses />
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/instuctor-rating"
+              element={
+                <ProtectedRoutes>
+                  <RateInstructor />
                 </ProtectedRoutes>
               }
             />
@@ -152,6 +173,7 @@ const App = () => {
           </Routes>
         </Suspense>
         {isWishlistOpen && <Wishlist />}
+        {isStartSessionOpen && <StartSession />}
         {isUserLoginOpen && (
           <div className="login-slider">
             <Suspense fallback={<Loading />}>

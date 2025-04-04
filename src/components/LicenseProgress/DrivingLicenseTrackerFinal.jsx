@@ -53,6 +53,16 @@ const DrivingLicenseTracker = ({ data }) => {
 
   const testAttempts = JSON.parse(drivingLicenseData.test_attempts || '[]');
 
+  const isRetestSlot = () => {
+    // Check if there's at least one failed test in the history
+    const hasFailedTests = parsedAttempts.some(
+      (attempt) => attempt.status === 'test_failed'
+    );
+
+    // And the current status is slot_booked
+    return hasFailedTests && drivingLicenseData.status === 'slot_booked';
+  };
+
   return (
     <div>
       <h3 className="font-medium text-gray-800 mb-4 text-2xl">
@@ -65,7 +75,7 @@ const DrivingLicenseTracker = ({ data }) => {
           <div className="flex flex-col items-center mr-4">
             <div
               className={`w-6 h-6 ${
-                isStepCompleted(1) ? 'bg-black' : 'bg-gray-300'
+                isStepCompleted(0) ? 'bg-black' : 'bg-gray-300'
               } rounded-full flex items-center justify-center`}
             >
               {isStepCompleted(1) ? (
@@ -79,8 +89,70 @@ const DrivingLicenseTracker = ({ data }) => {
           <div className="pt-0.5 space-y-2">
             <p className="text-sm text-gray-800">Book DL Test Slot</p>
             <div className="flex items-start flex-col justify-between">
+              {/* Book Slot Button (if no slot booked) */}
+              {!drivingLicenseData.slot_datetime ? (
+                <button className="bg-black text-white text-xs px-4 py-1.5 rounded-lg flex items-center w-fit">
+                  Book Slot
+                </button>
+              ) : (
+                <div className="bg-gray-100 p-2 rounded-md mt-2 flex justify-between items-center space-x-3 ">
+                  <p className="text-xs">
+                    Slot Booked For{' '}
+                    {formatDate(drivingLicenseData.slot_datetime)}
+                  </p>
+                  {failedAttempts.length > 0 && (
+                    <div className="bg-gray-100 p-2 rounded-md flex items-center space-x-3">
+                      <p className="text-xs text-red-500 flex items-center gap-2">
+                        <X /> Test Failed
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* How to Identify This Is Retest Slot */}
+              {isRetestSlot() && (
+                <div className="bg-gray-100 p-2 rounded-md mt-2 flex items-center space-x-3">
+                  <p className="text-xs text-gray-800">
+                    Retest Slot Booked for{' '}
+                    {formatDate(drivingLicenseData.slot_datetime)}
+                  </p>
+                  <span className="text-xs text-blue-600 font-medium">
+                    {drivingLicenseData.status === 'test_passed'
+                      ? 'Test Passed'
+                      : ''}
+                  </span>
+                </div>
+              )}
+
+              {/* Show Test Passed separately if applicable */}
+              {drivingLicenseData.status === 'dispatched' ||
+                (drivingLicenseData.status === 'delivered' &&
+                  drivingLicenseData.test_passed_at && (
+                    <div className="bg-green-100 p-2 rounded-md mt-2 flex items-center space-x-3">
+                      <Check className="w-4 h-4 text-green-500" />
+                      <p className="text-xs text-green-800">
+                        Test Passed on{' '}
+                        {formatDate(drivingLicenseData.test_passed_at)}
+                      </p>
+                    </div>
+                  ))}
+
+              {drivingLicenseData.status === 'test_failed' && (
+                <div className="flex items-center gap-2 mt-2 w-full">
+                  <a
+                    href={''}
+                    className="bg-black text-white text-xs px-2 py-1.5 rounded-lg flex items-center w-full max-w-40"
+                  >
+                    Pay Retest Fee
+                  </a>
+                  <p className="text-xs text-gray-500">
+                    You have to pay a retest fee of Rs 300/- to book a retest
+                    slot
+                  </p>
+                </div>
+              )}
               {/* Show Initial Slot Booking */}
-              {testAttempts.length > 0 && (
+              {/* {testAttempts.length > 0 && (
                 <div className="bg-gray-100 p-2 rounded-md mt-2 flex justify-between items-center space-x-3 ">
                   <p className="text-xs">
                     Slot Booked For {formatDate(testAttempts[0].slot_datetime)}
@@ -91,61 +163,7 @@ const DrivingLicenseTracker = ({ data }) => {
                     </span>
                   )}
                 </div>
-              )}
-
-              {/* {drivingLicenseData.status === 'slot_booked' ||
-              drivingLicenseData.status === 'test_passed' ||
-              drivingLicenseData.current_step === 2 ? (
-                <div className="bg-gray-100 p-2 rounded-md mt-2">
-                  <p className="text-xs">
-                    Slot Booked For{' '}
-                    {formatDate(drivingLicenseData.slot_datetime) || 'N/A'}
-                  </p>
-                </div>
-              ) : (
-                <button className="bg-black text-white text-xs px-4 py-1.5 rounded-lg flex items-center w-fit">
-                  Book Slot
-                </button>
               )} */}
-
-              {/* Show Retest Slots if available */}
-              {/* {passedAttempts.length > 0 && (
-                <div className="bg-gray-100 p-2 rounded-md mt-2 flex items-center space-x-3">
-                  <p className="text-xs text-gray-800">
-                    Retest Slot Booked for{' '}
-                    {formatDate(passedAttempts[0].slot_datetime)}
-                  </p>
-                  <span className="text-xs text-blue-500 font-medium">
-                    Test Passed
-                  </span>
-                </div>
-              )} */}
-
-              {/* Book Slot Button (if no slot booked) */}
-              {!drivingLicenseData.slot_datetime && (
-                <button className="bg-black text-white text-xs px-4 py-1.5 rounded-lg flex items-center w-fit">
-                  Book Slot
-                </button>
-              )}
-
-              {/* Retest Fee Payment Option */}
-              {drivingLicenseData.status === 'test_failed' && (
-                <div className="flex items-center gap-2 mt-2 w-full">
-                  <a
-                    href={''}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-black text-white text-xs px-2 py-1.5 rounded-lg flex items-center w-full max-w-40 "
-                  >
-                    Pay Retest Fee
-                  </a>
-
-                  <p className="text-xs text-gray-500 flex items-center gap-2">
-                    You have to pay a retest fee of Rs 300/- to book a retest
-                    slot
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>

@@ -1,20 +1,22 @@
 import React from 'react';
 
 import bg from '../../assets/images/bannerBg.png';
+import { useDispatch } from 'react-redux';
+import { toggleOpenStartSession } from '../../redux/slices/sessionSlice';
+import { useNavigate } from 'react-router-dom';
 
 const CourseBanner = ({ upcomingSession, message }) => {
-  // const {
-  //   booking_id,
-  //   slot_date,
-  //   slot_time,
-  //   amount,
-  //   session_type,
-  //   image,
-  //   title,
-  //   booking_status,
-  // } = upcomingSession;
 
-  // console.log(upcomingSession);
+const navigate = useNavigate();
+  console.log(upcomingSession);
+
+  const dispatch = useDispatch();
+
+  const handlesessionstart  = () => {
+    navigate('session')
+    // dispatch(toggleOpenStartSession(true))
+  }
+  
   return (
     <div className="px-6 sm:px-12 md:px-24 py-8">
       <div>
@@ -38,7 +40,7 @@ const CourseBanner = ({ upcomingSession, message }) => {
               Practice Session: {upcomingSession.session_id}
             </p>
 
-            <div className="mt-4 md:mt-5 flex justify-end">
+            <div className="mt-4 md:mt-5 flex justify-end"onClick={handlesessionstart} >
               <button className="bg-white text-black text-sm md:text-base rounded-md px-4 md:px-3 py-2 md:py-1 font-medium">
                 Start Session
               </button>

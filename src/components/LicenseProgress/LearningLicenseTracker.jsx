@@ -147,7 +147,7 @@ export default function LearningLicenseTracker({ data }) {
               {licenseData.status === 'test_failed' && (
                 <div>
                   <div className="bg-gray-100 p-3 rounded-md flex items-center space-x-5 ">
-                    <p className="text-xs text-red-700 mb-1 flex items-center ">
+                    <p className="text-xs text-red-700 mb-1 flex items-center font-medium ">
                       <X /> Text Failed
                     </p>
                     {/* Show attempts remaining if available */}
@@ -208,30 +208,37 @@ export default function LearningLicenseTracker({ data }) {
                 licenseData.status === 'test_failed') ||
                 (licenseData.status === 'test_pending' && (
                   <div className="bg-gray-100 p-3 rounded-md">
-                    <p className="text-xs text-gray-700 mb-1">
+                    <p className="text-xs text-gray-700 mb-1 flex gap-3">
                       Application ID: {licenseData.application_id}
+                      <span>
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              licenseData.application_id
+                            )
+                          }
+                          className="text-xs text-blue-500 hover:underline"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </span>
                     </p>
-                    <button
-                      onClick={() =>
-                        navigator.clipboard.writeText(
-                          licenseData.application_id
-                        )
-                      }
-                      className="text-xs text-blue-500 hover:underline"
-                    >
-                      Copy
-                    </button>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 flex gap-3">
                       Password: {licenseData.test_password}
+                      <span>
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              licenseData.test_password
+                            )
+                          }
+                          className="text-xs text-blue-500 hover:underline"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </span>
                     </p>
-                    <button
-                      onClick={() =>
-                        navigator.clipboard.writeText(licenseData.test_password)
-                      }
-                      className="text-xs text-blue-500 hover:underline"
-                    >
-                      Copy
-                    </button>
+
                     <a
                       href={licenseData.test_link}
                       target="_blank"
@@ -242,6 +249,21 @@ export default function LearningLicenseTracker({ data }) {
                     </a>
                   </div>
                 ))}
+
+              {licenseData.attempts_remaining > 3 && (
+                <div className="bg-gray-100 p-3 rounded-md flex items-center space-x-5 ">
+                  <p className="text-xs text-red-700 mb-1 flex items-center font-medium ">
+                    <X /> Text Failed
+                  </p>
+
+                  {/* Show attempts remaining if available */}
+                  {licenseData.attempts_remaining && (
+                    <p className="text-xs text-gray-500">
+                      Attempts remaining: {licenseData.attempts_remaining}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {licenseData.status === 'test_passed' && (
                 <div className="flex items-center  bg-gray-100 py-2 px-2 rounded-lg">
@@ -256,18 +278,18 @@ export default function LearningLicenseTracker({ data }) {
               )}
 
               {/* Show test result */}
-              {(licenseData.status === 'test_passed' ||
-                licenseData.status === 'license_ready') && (
-                <div className="flex items-center">
-                  <Check className="w-4 h-4 text-blue-500 mr-1.5" />
-                  <p className="text-xs text-blue-500">Test Passed</p>
-                  {licenseData.test_passed_at && (
-                    <p className="text-xs text-gray-500 ml-2">
-                      {formatDate(licenseData.test_passed_at)}
-                    </p>
-                  )}
-                </div>
-              )}
+              {licenseData.status === 'test_passed' ||
+                (licenseData.status === 'license_ready' && (
+                  <div className="flex items-center">
+                    <Check className="w-4 h-4 text-blue-500 mr-1.5" />
+                    <p className="text-xs text-blue-500">Test Passed</p>
+                    {licenseData.test_passed_at && (
+                      <p className="text-xs text-gray-500 ml-2">
+                        {formatDate(licenseData.test_passed_at)}
+                      </p>
+                    )}
+                  </div>
+                ))}
             </div>
           </div>
 
