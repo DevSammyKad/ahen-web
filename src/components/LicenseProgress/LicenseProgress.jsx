@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../Navbar';
 import Attached_one from '../Images/Attached-one.svg';
 import Attached_two from '../Images/Attached-two.svg';
-import LearningLicense from './LearningLicense';
-import DrivingLicenseSection from './DrivingLicenseSection';
-import toast, { Toaster } from 'react-hot-toast';
+
+import toast from 'react-hot-toast';
 import LearningLicenseTracker from './LearningLicenseTracker';
 import DrivingLicenseTracker from './DrivingLicenseTracker';
 

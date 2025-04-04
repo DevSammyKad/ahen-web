@@ -1,8 +1,14 @@
-import { Check, ChevronDown, Clock, Cross, Download, X } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  Clock,
+  Copy,
+  Cross,
+  Download,
+  X,
+} from 'lucide-react';
 
 export default function LearningLicenseTracker({ data }) {
-  console.log('Learning License Data:', data);
-
   if (!data) {
     return <p>Loading...</p>;
   }
@@ -18,16 +24,8 @@ export default function LearningLicenseTracker({ data }) {
   const isCurrentStep = (stepNumber) => {
     return licenseData.current_step === stepNumber;
   };
-
   // Format date from ISO string
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    try {
-      return format(new Date(dateString), "dd MMM yyyy 'at' h:mm a");
-    } catch (e) {
-      return dateString;
-    }
-  };
+
   return (
     <div>
       {/* Learning License Section */}
@@ -145,22 +143,6 @@ export default function LearningLicenseTracker({ data }) {
             </div>
             <div className="pt-0.5 space-y-2">
               <p className="text-sm text-gray-800">Learning License Test</p>
-
-              {licenseData.status === 'test_failed' ||
-                (licenseData.current_step > 3 && (
-                  <div className="bg-gray-100 p-3 rounded-md flex items-center space-x-5 ">
-                    <p className="text-xs text-red-700 mb-1 flex items-center ">
-                      <X /> Text Failed
-                    </p>
-                    {/* Show attempts remaining if available */}
-                    {licenseData.attempts_remaining && (
-                      <p className="text-xs text-gray-500">
-                        Attempts remaining: {licenseData.attempts_remaining}
-                      </p>
-                    )}
-                  </div>
-                ))}
-
               {/* isStepCompleted(4) && */}
               {licenseData.status === 'test_failed' && (
                 <div>
@@ -176,11 +158,36 @@ export default function LearningLicenseTracker({ data }) {
                     )}
                   </div>
                   <div className="bg-gray-100 p-3 rounded-md mt-2">
-                    <p className="text-xs text-gray-700 mb-1">
+                    <p className="text-xs text-gray-700 mb-1 flex gap-3">
                       Application ID: {licenseData.application_id}
+                      <span>
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              licenseData.application_id
+                            )
+                          }
+                          className="text-xs text-blue-500 hover:underline"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </span>
                     </p>
-                    <p className="text-xs text-gray-500">
+
+                    <p className="text-xs text-gray-500 flex gap-3">
                       Password: {licenseData.test_password}
+                      <span>
+                        <button
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              licenseData.test_password
+                            )
+                          }
+                          className="text-xs text-blue-500 hover:underline"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </span>
                     </p>
                     <a
                       href={licenseData.test_link}
@@ -200,13 +207,31 @@ export default function LearningLicenseTracker({ data }) {
                 licenseData.test_link &&
                 licenseData.status === 'test_failed') ||
                 (licenseData.status === 'test_pending' && (
-                  <div className="bg-gray-500 p-3 rounded-md">
+                  <div className="bg-gray-100 p-3 rounded-md">
                     <p className="text-xs text-gray-700 mb-1">
                       Application ID: {licenseData.application_id}
                     </p>
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(
+                          licenseData.application_id
+                        )
+                      }
+                      className="text-xs text-blue-500 hover:underline"
+                    >
+                      Copy
+                    </button>
                     <p className="text-xs text-gray-500">
                       Password: {licenseData.test_password}
                     </p>
+                    <button
+                      onClick={() =>
+                        navigator.clipboard.writeText(licenseData.test_password)
+                      }
+                      className="text-xs text-blue-500 hover:underline"
+                    >
+                      Copy
+                    </button>
                     <a
                       href={licenseData.test_link}
                       target="_blank"
@@ -231,18 +256,18 @@ export default function LearningLicenseTracker({ data }) {
               )}
 
               {/* Show test result */}
-              {licenseData.status === 'test_passed' ||
-                (licenseData.status === 'license_ready' && (
-                  <div className="flex items-center">
-                    <Check className="w-4 h-4 text-blue-500 mr-1.5" />
-                    <p className="text-xs text-blue-500">Test Passed</p>
-                    {licenseData.test_passed_at && (
-                      <p className="text-xs text-gray-500 ml-2">
-                        {formatDate(licenseData.test_passed_at)}
-                      </p>
-                    )}
-                  </div>
-                ))}
+              {(licenseData.status === 'test_passed' ||
+                licenseData.status === 'license_ready') && (
+                <div className="flex items-center">
+                  <Check className="w-4 h-4 text-blue-500 mr-1.5" />
+                  <p className="text-xs text-blue-500">Test Passed</p>
+                  {licenseData.test_passed_at && (
+                    <p className="text-xs text-gray-500 ml-2">
+                      {formatDate(licenseData.test_passed_at)}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -294,3 +319,20 @@ export default function LearningLicenseTracker({ data }) {
     </div>
   );
 }
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+
+  try {
+    return new Intl.DateTimeFormat('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date(dateString));
+  } catch (e) {
+    return dateString;
+  }
+};

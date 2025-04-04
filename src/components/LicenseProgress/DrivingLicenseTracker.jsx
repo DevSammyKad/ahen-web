@@ -35,6 +35,14 @@ const DrivingLicenseTracker = ({ data }) => {
 
   console.log('Type of test_attempts:', typeof parsedAttempts);
 
+  const failedAttempts = parsedAttempts.filter(
+    (attempt) => attempt.status === 'test_failed'
+  );
+
+  const passedAttempts = parsedAttempts.filter(
+    (attempt) => attempt.status === 'test_passed'
+  );
+
   const isStepCompleted = (stepNumber) => {
     return drivingLicenseData.current_step > stepNumber;
   };
@@ -42,6 +50,8 @@ const DrivingLicenseTracker = ({ data }) => {
   const isCurrentStep = (stepNumber) => {
     return drivingLicenseData.current_step === stepNumber;
   };
+
+  // const testAttempts = JSON.parse(drivingLicenseData.test_attempts || '[]');
 
   return (
     <div>
@@ -69,7 +79,22 @@ const DrivingLicenseTracker = ({ data }) => {
           <div className="pt-0.5 space-y-2">
             <p className="text-sm text-gray-800">Book DL Test Slot</p>
             <div className="flex items-start flex-col justify-between">
-              {drivingLicenseData.status === 'slot_booked' ||
+              {/* Show Initial Slot Booking */}
+              {parsedAttempts.length > 0 && (
+                <div className="bg-gray-100 p-2 rounded-md mt-2 flex justify-between items-center space-x-3 ">
+                  <p className="text-xs">
+                    Slot Booked For{' '}
+                    {formatDate(parsedAttempts[0].slot_datetime)}
+                  </p>
+                  {parsedAttempts[0].status === 'test_failed' && (
+                    <span className="text-xs text-red-500 font-medium">
+                      Test Failed
+                    </span>
+                  )}
+                </div>
+              )}
+              {/* {drivingLicenseData.status === 'slot_booked' ||
+              drivingLicenseData.status === 'test_passed' ||
               drivingLicenseData.current_step === 2 ? (
                 <div className="bg-gray-100 p-2 rounded-md mt-2">
                   <p className="text-xs">
@@ -81,16 +106,36 @@ const DrivingLicenseTracker = ({ data }) => {
                 <button className="bg-black text-white text-xs px-4 py-1.5 rounded-lg flex items-center w-fit">
                   Book Slot
                 </button>
+              )} */}
+
+              {/* Show Retest Slots if available */}
+              {passedAttempts.length > 0 && (
+                <div className="bg-gray-100 p-2 rounded-md mt-2 flex items-center space-x-3">
+                  <p className="text-xs text-gray-800">
+                    Retest Slot Booked for{' '}
+                    {formatDate(passedAttempts[0].slot_datetime)}
+                  </p>
+                  <span className="text-xs text-blue-500 font-medium">
+                    Test Passed
+                  </span>
+                </div>
               )}
 
-              {/* If Test failed */}
-              {drivingLicenseData.status === 'test_failed' ? (
+              {/* Book Slot Button (if no slot booked) */}
+              {!drivingLicenseData.slot_datetime && (
+                <button className="bg-black text-white text-xs px-4 py-1.5 rounded-lg flex items-center w-fit">
+                  Book Slot
+                </button>
+              )}
+
+              {/* Retest Fee Payment Option */}
+              {drivingLicenseData.status === 'test_failed' && (
                 <div className="flex items-center gap-2 mt-2 w-full">
                   <a
                     href={''}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-black text-white text-xs px-2 py-1.5 rounded-lg flex items-center w-full"
+                    className="bg-black text-white text-xs px-2 py-1.5 rounded-lg flex items-center w-full max-w-40 "
                   >
                     Pay Retest Fee
                   </a>
@@ -99,9 +144,8 @@ const DrivingLicenseTracker = ({ data }) => {
                     You have to pay a retest fee of Rs 300/- to book a retest
                     slot
                   </p>
-                  {/* If apply for Retest */}
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
@@ -248,7 +292,7 @@ const DrivingLicenseTracker = ({ data }) => {
 
 const DrivingTestPassStatus = ({ status }) => {
   return (
-    <div className="flex items-center justify-between bg-gray-100 p-2 rounded-md">
+    <div className="flex items-center justify-between bg-gray-200 p-2 rounded-md">
       <Check className="w-4 h-4 text-green-500 mr-1.5" />
       <p className="text-xs text-green-500">Test Passed</p>
       <p className="text-xs text-gray-500 ml-2">
@@ -260,20 +304,26 @@ const DrivingTestPassStatus = ({ status }) => {
 
 const DrivingTestPendingStatus = ({ status }) => {
   return (
-    <div className="flex items-center justify-between bg-gray-100 p-2 rounded-md">
+    <div className="flex items-center justify-between bg-gray-200 p-2 rounded-md">
       <Clock className="w-4 h-4 text-yellow-500 mr-1.5" />
       <p className="text-xs text-yellow-500">Test Pending</p>
-      <p className="text-xs text-gray-500 ml-2">{status.test_date}</p>
+      <p className="text-xs text-gray-500 ml-2">
+        {' '}
+        {formatDate(status.test_date)}
+      </p>
     </div>
   );
 };
 
 const DrivingTestFailedStatus = ({ status }) => {
   return (
-    <div className="flex items-center justify-between bg-gray-100 p-2 rounded-md">
+    <div className="flex items-center justify-between bg-gray-200 p-2 rounded-md">
       <X className="w-4 h-4 text-red-500 mr-1.5" />
       <p className="text-xs text-red-500">Test Failed</p>
-      <p className="text-xs text-gray-500 ml-2">{status.test_date}</p>
+      <p className="text-xs text-gray-500 ml-2">
+        {' '}
+        {formatDate(status.test_date)}
+      </p>
     </div>
   );
 };
