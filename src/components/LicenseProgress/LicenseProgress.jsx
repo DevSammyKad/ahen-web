@@ -6,7 +6,7 @@ import Attached_two from '../Images/Attached-two.svg';
 import toast from 'react-hot-toast';
 import LearningLicenseTracker from './LearningLicenseTracker';
 import DrivingLicenseTracker from './DrivingLicenseTracker';
-import DrivingLicenseTrackerFinal from './DrivingLicenseTrackerfinal';
+import DrivingLicenseTrackerFinal from './DrivingLicenseTrackerFinal';
 
 function LicenseProgress() {
   const [learningData, setLearningData] = useState(null);
