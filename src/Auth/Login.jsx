@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import toast from 'react-hot-toast';
 import loginImg from '../assets/images/loginImg.png';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const Login = () => {
   });
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleOpenLogin = () => {
     dispatch(toggleOpenUserLogin(false));
@@ -102,6 +104,8 @@ const Login = () => {
 
       localStorage.setItem('user_id', data?.userId);
       localStorage.setItem('userData', JSON.stringify(formData));
+      navigate('/profile');
+
       handleOpenLogin();
     } catch (err) {
       toast.error(err.message, { id: toastId });

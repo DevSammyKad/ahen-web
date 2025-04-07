@@ -71,7 +71,6 @@ const SelectSlot = ({ handleClose, car }) => {
   const createSession = async (slotDate) => {
     try {
       const token = JSON.parse(localStorage.getItem('token'));
-
       const requestBody = {
         practisedrivingid: car.id,
         booking_date: new Date().toISOString().split('T')[0],
@@ -93,6 +92,8 @@ const SelectSlot = ({ handleClose, car }) => {
         credentials: 'include',
         body: JSON.stringify(requestBody),
       });
+
+      console.log('Booking Response:', response);
 
       const data = await response.json();
 
@@ -175,7 +176,19 @@ const SelectSlot = ({ handleClose, car }) => {
     }
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
+    // Fetch user address from API
+    const res = await fetch(
+      `https://driving.shellcode.cloud/api/get-address/${user?.id}`
+    );
+    const data = await res.json();
+
+    // If user has not added address
+    if (!data?.data?.flat_no && !data?.data?.city && !data?.data?.landmark) {
+      toast.error('Please update your address in your profile before booking.');
+      return;
+    }
+
     if (selectedDay !== null && selectedTimeSlot) {
       const selectedDayObj = days.find((day) => day.id === selectedDay);
       const slotDate = selectedDayObj

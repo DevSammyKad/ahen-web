@@ -38,3 +38,7 @@ Retest Slot Booked For{' '}
                 )}
               </div>
             ))}
+
+Forget Password
+verification
+Booking
